@@ -25,11 +25,11 @@ package CGI::Session::ID::UUID;
 require 5.006;
 use strict;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 #   determine available UUID generator
 our $generator;
-foreach my $module (qw(OSSP::uuid Data::UUID)) {
+foreach my $module (qw(OSSP::uuid Data::UUID APR::UUID DCE::UUID UUID)) {
     { no strict; no warnings; local $SIG{__DIE__} = 'IGNORE'; 
       eval "use $module"; }
     if (not $@) {
@@ -39,7 +39,7 @@ foreach my $module (qw(OSSP::uuid Data::UUID)) {
 }
 if (not defined($generator)) {
     die "no UUID generator available " .
-        "(require OSSP::uuid or Data::UUID)";
+        "(requires OSSP::uuid, Data::UUID, APR::UUID, DCE::UUID or UUID)";
 }
 
 #   the id generation method
@@ -48,16 +48,39 @@ sub generate_id {
 
     my $id;
     if ($generator eq 'OSSP::uuid') {
-        #   use OSSP::uuid (preference)
+        #   self-contained OSSP::uuid
+        #   (preference; ultra portable; accurate implementation)
         my $uuid = new OSSP::uuid();
         $uuid->make("v1");
         $id = $uuid->export("str");
         undef $uuid;
     }
     elsif ($generator eq 'Data::UUID') {
-        #   use Data::UUID (alternative)
+        #   self-contained Data::UUID
+        #   (alternative; less portable; acceptable implementation)
         my $uuid = new Data::UUID();
         $id = $uuid->create_str();
+        undef $uuid;
+    }
+    elsif ($generator eq 'APR::UUID') {
+        #   Apache/mod_perl based APR::UUID
+        #   (alternative; less portable; acceptable implementation)
+        my $uuid = new APR::UUID();
+        $id = $uuid->format();
+        undef $uuid;
+    }
+    elsif ($generator eq 'DCE::UUID') {
+        #   Solaris/DCE based DCE::UUID
+        #   (alternative; not portable; unknown implementation)
+        my $uuid = uuid_create();
+        $id = "$uuid";
+        undef $uuid;
+    }
+    elsif ($generator eq 'UUID') {
+        #   Linux/e2fsprogs based UUID
+        #   (alternative; less portable; acceptable implementation)
+        my $uuid; UUID::generate($uuid);
+        UUID::unparse($uuid, $id);
         undef $uuid;
     }
 
@@ -74,17 +97,18 @@ CGI::Session::ID::UUID - UUID based CGI Session Identifiers
 
 =head1 SYNOPSIS
 
-use CGI::Session;
+ use CGI::Session;
 
-$session = new CGI::Session("...;B<id:UUID>", ...);
+ $session = new CGI::Session("...;id:UUID", ...);
 
 =head1 DESCRIPTION
 
 CGI::Session::ID::UUID is a CGI::Session driver to generate identifiers
 based on DCE 1.1 and ISO/IEC 11578:1996 compliant Universally Unique
 Identifiers (UUID). This module requires a reasonable UUID generator.
-For this it either requires the OSSP::uuid (preference) or Data::UUID
-(alternative) modules to be installed.
+For this it either requires the preferred OSSP::uuid module or
+alternatively the Data::UUID, APR::UUID, DCE::UUID or UUID modules to be
+installed.
 
 =head1 AUTHOR
 
@@ -94,9 +118,15 @@ Ralf S. Engelschall <rse@engelschall.com>
 
 L<CGI::Session|CGI::Session>
 
-L<OSSP::uuid|OSSP::uuid>, http://www.ossp.org/pkg/lib/uuid/
+L<OSSP::uuid|OSSP::uuid> L<http://www.ossp.org/pkg/lib/uuid/> 
 
-L<Data::UUID|Data::UUID>, http://www.cpan.org/modules/by-module/Data/
+L<Data::UUID|Data::UUID> L<http://www.cpan.org/modules/by-module/Data/>
+
+L<APR::UUID|APR::UUID> L<http://www.cpan.org/modules/by-module/Apache/>
+
+L<DCE::UUID|DCE::UUID> L<http://www.cpan.org/modules/by-module/DCE/>
+
+L<UUID|UUID> L<http://www.cpan.org/modules/by-module/UUID/>
 
 =cut
 
