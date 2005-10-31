@@ -1,5 +1,5 @@
 ##
-##  CGI::Session::ID::UUID -- UUID based CGI Session Identifiers
+##  CGI::Session::ID::uuid -- UUID based CGI Session Identifiers
 ##  Copyright (c) 2005 Ralf S. Engelschall <rse@engelschall.com>
 ##
 ##  This program is free software; you can redistribute it and/or modify
@@ -20,12 +20,12 @@
 ##  UUID.pm: Module Implementation
 ##
 
-package CGI::Session::ID::UUID;
+package CGI::Session::ID::uuid;
 
 require 5.006;
 use strict;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 #   determine available UUID generator
 our $generator;
@@ -93,22 +93,22 @@ sub generate_id {
 
 =head1 NAME
 
-CGI::Session::ID::UUID - UUID based CGI Session Identifiers
+CGI::Session::ID::uuid - UUID based CGI Session Identifiers
 
 =head1 SYNOPSIS
 
  use CGI::Session;
 
- $session = new CGI::Session("...;id:UUID", ...);
+ $session = new CGI::Session("...;id:uuid", ...);
 
 =head1 DESCRIPTION
 
-CGI::Session::ID::UUID is a CGI::Session driver to generate identifiers
-based on DCE 1.1 and ISO/IEC 11578:1996 compliant Universally Unique
-Identifiers (UUID). This module requires a reasonable UUID generator.
-For this it either requires the preferred OSSP::uuid module or
-alternatively the Data::UUID, APR::UUID, DCE::UUID or UUID modules to be
-installed.
+CGI::Session::ID::uuid is a CGI::Session 4.00 driver to generate
+identifiers based on DCE 1.1 and ISO/IEC 11578:1996 compliant
+Universally Unique Identifiers (UUID). This module requires a reasonable
+UUID generator. For this it either requires the preferred OSSP::uuid
+module or alternatively the Data::UUID, APR::UUID, DCE::UUID or UUID
+modules to be installed.
 
 =head1 AUTHOR
 

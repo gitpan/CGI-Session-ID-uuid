@@ -1,5 +1,5 @@
 MANIFEST
 README
 Makefile.PL
-UUID.pm
+uuid.pm
 META.yml                                 Module meta-data (added by MakeMaker)
